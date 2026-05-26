@@ -493,6 +493,37 @@ export default function App() {
               </p>
             </div>
 
+            {/* OPTIONAL GEMINI API KEY INPUT ON LOGIN PAGE */}
+            <div className="pt-2">
+              <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-wider">
+                API Key Gemini Anda (Opsional)
+              </label>
+              <div className="relative flex items-center">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  value={geminiApiKey}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setGeminiApiKey(val);
+                    localStorage.setItem("manual_gemini_api_key", val);
+                  }}
+                  placeholder="Isi jika ingin menggunakan API Key sendiri (AIzaSy...)"
+                  className="w-full pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white outline-none focus:border-emerald-500 font-mono shadow-inner"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  title={showApiKey ? "Sembunyikan API Key" : "Tampilkan API Key"}
+                >
+                  {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <p className="text-[9px] text-slate-400 mt-1.5 leading-normal">
+                Disimpan aman di penyimpanan lokal browser Anda. Jika kosong, sistem akan menggunakan kunci default.
+              </p>
+            </div>
+
             {loginError && (
               <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-300 dark:border-red-900 text-red-750 dark:text-red-400 rounded-xl text-xs flex gap-2 items-center justify-center font-semibold text-center">
                 <AlertCircle size={14} className="shrink-0" />
@@ -737,6 +768,38 @@ export default function App() {
                 <p className="text-[10px] opacity-75 mt-0.5">Siap simpan, unduh, dan cetak</p>
               </div>
             </button>
+
+            {/* GEMINI API KEY COMPACT SIDEBAR INPUT */}
+            <div className="pt-4 mt-4 border-t border-slate-800">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 block mb-2 px-1 flex items-center justify-between">
+                <span>API Key Gemini</span>
+                <span className="text-[8px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded font-mono border border-emerald-900/40">Active</span>
+              </span>
+              <div className="px-1 relative flex items-center">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  value={geminiApiKey}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setGeminiApiKey(val);
+                    localStorage.setItem("manual_gemini_api_key", val);
+                  }}
+                  placeholder="Isi custom API Key (AIzaSy...)"
+                  className="w-full pl-2 pr-7 py-2 bg-slate-800 border border-slate-705 rounded-xl text-[11px] text-white outline-none focus:border-emerald-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors"
+                  title={showApiKey ? "Sembunyikan API Key" : "Tampilkan API Key"}
+                >
+                  {showApiKey ? <EyeOff size={12} /> : <Eye size={12} />}
+                </button>
+              </div>
+              <p className="text-[9px] text-slate-500 mt-1 px-1 leading-tight">
+                Disimpan di penyimpanan lokal browser Anda.
+              </p>
+            </div>
 
             {/* PRESET LOADERS BOX */}
             <div className="pt-6 mt-6 border-t border-slate-800">
