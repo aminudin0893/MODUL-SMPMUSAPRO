@@ -23,6 +23,9 @@ import {
   AlertCircle,
   Clock,
   Eye,
+  EyeOff,
+  Lock,
+  LogOut,
   FileCheck,
   Save,
   FolderOpen
@@ -32,6 +35,19 @@ import { TEMPLATES } from "./templates";
 import { exportToWord } from "./docxExporter";
 
 export default function App() {
+  // Gemini API Key state
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
+    return localStorage.getItem("manual_gemini_api_key") || "";
+  });
+  const [showApiKey, setShowApiKey] = useState<boolean>(false);
+
+  // Login PIN state
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem("edu_pin_logged_in") === "true";
+  });
+  const [pinCode, setPinCode] = useState<string>("");
+  const [loginError, setLoginError] = useState<string>("");
+
   // Theme dark state
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem("edu_theme") === "dark";
@@ -313,7 +329,8 @@ export default function App() {
           mingguEfektif,
           tpPerBab,
           jpPenilaian,
-          babs
+          babs,
+          customApiKey: geminiApiKey
         })
       });
 
@@ -409,6 +426,98 @@ export default function App() {
   const totalJP = babs.reduce((acc, b) => acc + Number(b.jp || 0), 0);
   const matchedMapel = mapel === "Custom" ? customMapel : mapel;
 
+  if (!isLoggedIn) {
+    const handleLoginSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (pinCode === "085227") {
+        setIsLoggedIn(true);
+        localStorage.setItem("edu_pin_logged_in", "true");
+        setLoginError("");
+      } else {
+        setLoginError("Kode PIN yang Anda masukkan salah. Hubungi admin.");
+      }
+    };
+
+    return (
+      <div className={`min-h-screen flex items-center justify-center font-sans ${darkMode ? "dark bg-slate-950 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
+        <div className="absolute top-4 right-4 z-50">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/80 rounded-xl transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-700/50 shadow-xs animate-fade-in"
+            title="Ubah tema visual"
+          >
+            {darkMode ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
+          </button>
+        </div>
+
+        <div className="w-full max-w-md p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-300 animate-fade-in mx-4">
+          {/* Ambient Glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
+
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center font-serif text-white font-extrabold text-3xl tracking-widest mx-auto shadow-md shadow-emerald-500/20 mb-4 animate-pulse">
+              EG
+            </div>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              EduGen Pro
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest font-bold">
+              Kurikulum Merdeka 2024/2025
+            </p>
+          </div>
+
+          <form onSubmit={handleLoginSubmit} className="space-y-6">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-wider">
+                Akses Kode PIN Pembelajaran
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  value={pinCode}
+                  onChange={(e) => {
+                    setPinCode(e.target.value);
+                    if (loginError) setLoginError("");
+                  }}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-center text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-emerald-500 transition-all font-bold placeholder:tracking-normal placeholder:font-sans placeholder:text-xs text-slate-900 dark:text-white"
+                  placeholder="------"
+                  maxLength={12}
+                  autoFocus
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <Lock size={16} />
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-455 dark:text-slate-400 mt-1.5 text-center">
+                Masukkan Kode PIN <span className="font-semibold text-emerald-600 dark:text-emerald-400">085227</span> untuk masuk ke dalam aplikasi.
+              </p>
+            </div>
+
+            {loginError && (
+              <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-300 dark:border-red-900 text-red-750 dark:text-red-400 rounded-xl text-xs flex gap-2 items-center justify-center font-semibold text-center">
+                <AlertCircle size={14} className="shrink-0" />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-slate-900 hover:bg-black dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold text-xs tracking-wider rounded-2xl shadow-lg hover:shadow-emerald-500/10 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] duration-250"
+            >
+              <Lock size={14} />
+              <span>MASUK DAN MULAI</span>
+            </button>
+          </form>
+
+          <div className="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-center text-[10px] text-slate-400 dark:text-slate-500 leading-normal">
+            <p className="font-semibold text-slate-600 dark:text-slate-350">Developed by Bilqis Gaya Hasanah</p>
+            <p className="opacity-60 text-slate-400 dark:text-slate-550">Sistem Perangkat Ajar Otomatis Generasi AI</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col ${darkMode ? "dark bg-slate-950 text-slate-100" : ""}`}>
       
@@ -495,10 +604,25 @@ export default function App() {
           {/* Quick theme selector button */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
             title="Ubah tema visual"
           >
             {darkMode ? <Sun size={16} className="text-amber-500" /> : <Moon size={16} />}
+          </button>
+
+          {/* Logout button */}
+          <button
+            onClick={() => {
+              if (confirm("Apakah Anda yakin ingin keluar dari aplikasi?")) {
+                setIsLoggedIn(false);
+                localStorage.removeItem("edu_pin_logged_in");
+                setPinCode("");
+              }
+            }}
+            className="p-1.5 text-slate-600 dark:text-slate-350 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 rounded-lg transition-colors"
+            title="Keluar dari Aplikasi (Logout)"
+          >
+            <LogOut size={16} />
           </button>
         </div>
       </header>
@@ -1082,6 +1206,38 @@ export default function App() {
                   <h2 className="text-md font-bold text-slate-900 dark:text-white">3. Tinjau Ringkasan & Mulai Generate Dokumen</h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Pastikan seluruh data per bab dan kelas yang diinput telah benar untuk diproses oleh kecerdasan buatan.</p>
                 </div>
+              </div>
+
+              {/* GEMINI API KEY INPUT */}
+              <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl shadow-xs">
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-wider flex items-center justify-between">
+                  <span>Akses API Key Gemini (Opsional)</span>
+                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded font-semibold font-mono border border-emerald-250/30">Local Storage Active</span>
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type={showApiKey ? "text" : "password"}
+                    value={geminiApiKey}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setGeminiApiKey(val);
+                      localStorage.setItem("manual_gemini_api_key", val);
+                    }}
+                    placeholder="Masukkan API Key Gemini Anda di sini jika ada (AIzaSy...)"
+                    className="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-slate-850 border border-slate-250 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-500 font-mono shadow-inner"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    title={showApiKey ? "Sembunyikan API Key" : "Tampilkan API Key"}
+                  >
+                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 lines-leading-relaxed">
+                  Gunakan API Key Anda sendiri jika ingin melakukan ribuan kali pergerakan dokumen tanpa limits. API Key Anda disimpan seutuhnya di penyimpanan lokal browser.
+                </p>
               </div>
 
               {/* Grid Specifications Summary */}

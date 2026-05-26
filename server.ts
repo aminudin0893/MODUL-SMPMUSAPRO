@@ -23,10 +23,11 @@ app.post("/api/generate-curriculum", async (req, res) => {
     mingguEfektif = 18,
     tpPerBab = 3,
     jpPenilaian = 2,
-    babs = []
+    babs = [],
+    customApiKey
   } = req.body;
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = customApiKey || process.env.GEMINI_API_KEY;
 
   if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
     console.log("No valid GEMINI_API_KEY found, using local intelligent simulation generator.");
