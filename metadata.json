@@ -1,0 +1,6 @@
+{
+  "name": "EduGen Pro - Generator Perangkat Kurikulum Merdeka",
+  "description": "Generator otomatis berbasis AI untuk CP, TP, ATP, Prota, Promes per minggu, dan KKTP Kurikulum Merdeka dari PAUD hingga SMK Berdasarkan Kepka BSKAP No. 032/H/KR/2024. Ekspor ke Word (.docx) dan print langsung.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
